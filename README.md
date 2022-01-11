@@ -9,6 +9,40 @@ Perfect for integrating multiple openHAB instances or broadcasting all events.
 
 ## Preparation
 
+### Install the mosquitto MQTT broker
+
+The next step is to install the mosquitto MQTT broker on the master with
+
+```
+sudo apt install mosquitto mosquitto-clients
+```
+
+The slaves only need `mosquitto-clients` because all slaves will later be connected to the master.
+
+Then you have to edit the mosquitto.conf file:
+
+```
+# Place your local configuration in /etc/mosquitto/conf.d/
+#
+# A full description of the configuration file is at
+# /usr/share/doc/mosquitto/examples/mosquitto.conf.example
+
+listener 1883 0.0.0.0
+
+pid_file /run/mosquitto/mosquitto.pid
+
+persistence true
+persistence_location /var/lib/mosquitto/
+
+log_dest file /var/log/mosquitto/mosquitto.log
+
+include_dir /etc/mosquitto/conf.d
+
+allow_anonymous true
+```
+
+Of course you can use a password which mean you should not have to use `allow_anonymous true`. The more important thing is that you have to use `listener 1883 0.0.0.0`. This means that the mosquitto broker will be public accessible for all slaves (maybe if you want with a password).
+
 ### Install Jython on openHAB 2.x
 
 #### Install the openHAB Helper Libraries
@@ -142,6 +176,41 @@ sudo chown -R openhab:openhab /etc/openhab/automation/jsr223/python/personal/hel
 
 ## Install the MQTT Event Bus
 
+### Install the MQTT Event Bus on openHAB 2.x
+
+The script is adapted from Rich Koshak's [Marketplace MQTT Event Bus Script](https://community.openhab.org/t/marketplace-mqtt-event-bus/76938) from his [openHAB Rules Tools](https://github.com/rkoshak/openhab-rules-tools). We adopt a part of it.
+
+```
+cd ~
+git clone https://github.com/rkoshak/openhab-rules-tools.git
+cp -r ~/openhab-rules-tools/rules_utils/automation /etc/openhab2
+git clone https://github.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus.git
+cp -r ~/openHAB-Helper-Libraries-MQTT-Event-Bus/mqtt_eb/automation /etc/openhab
+sudo chmod -R 777 /etc/openhab2/automation
+sudo chown -R openhab:openhab /etc/openhab2/automation
+```
+
+Please copy the configuration from `/etc/openhab2/automation/lib/python/configuration.py.mqtt_eb-example` to `/etc/openhab2/automation/lib/python/configuration.py` and adjust it accordingly.
+
+You can have a look on the master/slave example!
+
+### Install the MQTT Event Bus on openHAB 3.x
+
+The script is adapted from Rich Koshak's [Marketplace MQTT Event Bus Script](https://community.openhab.org/t/marketplace-mqtt-event-bus/76938) from his [openHAB Rules Tools](https://github.com/rkoshak/openhab-rules-tools). We adopt a part of it.
+
+```
+cd ~
+git clone https://github.com/rkoshak/openhab-rules-tools.git
+cp -r ~/openhab-rules-tools/rules_utils/automation /etc/openhab
+git clone https://github.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus.git
+cp -r ~/openHAB-Helper-Libraries-MQTT-Event-Bus/mqtt_eb/automation /etc/openhab
+sudo chmod -R 777 /etc/openhab/automation
+sudo chown -R openhab:openhab /etc/openhab/automation
+```
+
+Please copy the configuration from `/etc/openhab/automation/lib/python/configuration.py.mqtt_eb-example` to `/etc/openhab/automation/lib/python/configuration.py` and adjust it accordingly.
+
+You can have a look on the master/slave example!
 
 ### Restart openHAB
 
