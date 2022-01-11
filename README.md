@@ -284,3 +284,193 @@ log:set DEBUG jsr223
 ```
 
 If you run `log:tail` you should see all DEBUG informations from the Scripted Automation. If you have installed the `Jython Hello World example` you should also see this in the logging.
+
+
+
+
+
+
+
+## Master / Slave example
+
+Please make sure that the slave(s) will be connected to the master's mosquitto broker!
+
+### Usage
+
+You have to make sure that the item names on the master and on the slave(s) are equal. The master should contain all items from all slaves. But not all slaves should contain all items from the master. This means that the slaves can have different items with different names. Also the slaves could have only a few items from the master. This can be thought of as a restricted user who only has access to a few items. For example, that a slave is in the bathroom and the openHAB instance in the bathroom then only allows the items in the bathroom to be operated. The master/slave principle can only subscribe where the corresponding item is present. Otherwise it will be published, but a slave or even none of the slaves will access this topic. Conversely, the master should be able to subscribe to everything that the slaves publish.
+
+### Configuration example 1
+
+On the master you can create a configuration like this:
+
+```
+log_state: true
+statePublishTopic: openHAB/in/${item}/state
+commandPublishTopic: ''
+stateSubscribeTopic: ''
+commandSubscribeTopic: openHAB/out/${item}/command
+```
+
+and on the slave like this:
+
+```
+log_state: true
+statePublishTopic: ''
+commandPublishTopic: openHAB/out/${item}/command
+stateSubscribeTopic: openHAB/in/${item}/state
+commandSubscribeTopic: ''
+```
+
+Or on the master you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master1 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master1 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`. On the slave you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave1 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave1 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`.
+
+### Configuration example 2
+
+On the master you can create a configuration like this:
+
+```
+log_state: true
+statePublishTopic: /messages/states/${item}
+commandPublishTopic: ''
+stateSubscribeTopic: ''
+commandSubscribeTopic: /messages/commands/${item}
+```
+
+and on the slave like this:
+
+```
+log_state: true
+statePublishTopic: ''
+commandPublishTopic: /messages/commands/${item}
+stateSubscribeTopic: /messages/states/${item}
+commandSubscribeTopic: ''
+```
+
+Or on the master you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master2 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master2 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`. On the slave you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave2 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave2 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`.
+
+### Proof of concept
+
+#### Check the master logging
+
+The logs on the master could look like this:
+
+```
+11:04:30.935 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '1b0b9317-db90-4f06-b9c7-6b00c255b72d' is executed.
+11:04:40.427 [INFO ] [openhab.event.ItemCommandEvent       ] - Item 'testSwitch' received command ON
+11:04:40.436 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Item-testSwitch-received-update_f7cbf540722811ec8814b827eba9d5bf_f7cc435e722811ecbbc4b827eba9d5bf' of rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is triggered.
+11:04:40.441 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using event bus name of Master
+11:04:40.443 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from OFF to ON
+11:04:40.458 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using statePublishTopic /messages/states/${item}
+11:04:40.463 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandPublishTopic
+11:04:40.468 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using stateSubscribeTopic
+11:04:40.473 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandSubscribeTopic /messages/commands/${item}
+11:04:40.478 [INFO ] [jsr223.jython.mqtt_eb                ] - Publishing ON to  /messages/states/testSwitch on mqtt:broker:mqttbroker with retained 1
+11:04:40.484 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is executed.
+11:04:40.927 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Time_cron_0_10_99df2880722811ec951cb827eba9d5bf_9a85a1b0722811ec9252b827eba9d5bf' of rule '1b0b9317-db90-4f06-b9c7-6b00c255b72d' is triggered.
+11:04:40.932 [INFO ] [.Jython Hello World (cron decorators)] - Hello World!
+11:04:40.937 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '1b0b9317-db90-4f06-b9c7-6b00c255b72d' is executed.
+11:04:44.282 [INFO ] [openhab.event.ChannelTriggeredEvent  ] - mqtt:broker:mqttbroker:commandUpdates triggered /messages/commands/testSwitch#OFF
+11:04:44.286 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Channel_mqtt_broker_mqttbroker_commandUpdates_triggered_f851ee1e722811eca8a8b827eba9d5bf_f852634f722811ec8b81b827eba9d5bf' of rule '34ec96f1-c16b-4b1e-8c51-11be573a252c' is triggered.
+11:04:44.294 [INFO ] [23.jython.MQTT Event Bus Subscription] - Subscribing /messages/commands/testSwitch with state  /messages/commands/testSwitch
+11:04:44.300 [INFO ] [23.jython.MQTT Event Bus Subscription] - Event type command for item testSwitch
+11:04:44.308 [DEBUG] [23.jython.MQTT Event Bus Subscription] - Received command OFF for Item testSwitch
+11:04:44.312 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '34ec96f1-c16b-4b1e-8c51-11be573a252c' is executed.
+11:04:44.313 [INFO ] [openhab.event.ItemCommandEvent       ] - Item 'testSwitch' received command OFF
+11:04:44.318 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Item-testSwitch-received-update_f7cbf540722811ec8814b827eba9d5bf_f7cc435e722811ecbbc4b827eba9d5bf' of rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is triggered.
+11:04:44.323 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from ON to OFF
+11:04:44.324 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using event bus name of Master
+11:04:44.329 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using statePublishTopic /messages/states/${item}
+11:04:44.335 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandPublishTopic
+11:04:44.340 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using stateSubscribeTopic
+11:04:44.345 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandSubscribeTopic /messages/commands/${item}
+11:04:44.351 [INFO ] [jsr223.jython.mqtt_eb                ] - Publishing OFF to  /messages/states/testSwitch on mqtt:broker:mqttbroker with retained 1
+11:04:44.355 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is executed.
+11:04:48.556 [INFO ] [openhab.event.ChannelTriggeredEvent  ] - mqtt:broker:mqttbroker:commandUpdates triggered /messages/commands/testSwitch#ON
+11:04:48.561 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Channel_mqtt_broker_mqttbroker_commandUpdates_triggered_f851ee1e722811eca8a8b827eba9d5bf_f852634f722811ec8b81b827eba9d5bf' of rule '34ec96f1-c16b-4b1e-8c51-11be573a252c' is triggered.
+11:04:48.567 [INFO ] [23.jython.MQTT Event Bus Subscription] - Subscribing /messages/commands/testSwitch with state  /messages/commands/testSwitch
+11:04:48.575 [INFO ] [23.jython.MQTT Event Bus Subscription] - Event type command for item testSwitch
+11:04:48.581 [DEBUG] [23.jython.MQTT Event Bus Subscription] - Received command ON for Item testSwitch
+11:04:48.585 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '34ec96f1-c16b-4b1e-8c51-11be573a252c' is executed.
+11:04:48.586 [INFO ] [openhab.event.ItemCommandEvent       ] - Item 'testSwitch' received command ON
+11:04:48.591 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Item-testSwitch-received-update_f7cbf540722811ec8814b827eba9d5bf_f7cc435e722811ecbbc4b827eba9d5bf' of rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is triggered.
+11:04:48.596 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from OFF to ON
+11:04:48.596 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using event bus name of Master
+11:04:48.603 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using statePublishTopic /messages/states/${item}
+11:04:48.608 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandPublishTopic
+11:04:48.613 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using stateSubscribeTopic
+11:04:48.618 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandSubscribeTopic /messages/commands/${item}
+11:04:48.623 [INFO ] [jsr223.jython.mqtt_eb                ] - Publishing ON to  /messages/states/testSwitch on mqtt:broker:mqttbroker with retained 1
+11:04:48.627 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is executed.
+11:04:50.928 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Time_cron_0_10_99df2880722811ec951cb827eba9d5bf_9a85a1b0722811ec9252b827eba9d5bf' of rule '1b0b9317-db90-4f06-b9c7-6b00c255b72d' is triggered.
+11:04:50.932 [INFO ] [.Jython Hello World (cron decorators)] - Hello World!
+11:04:50.937 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '1b0b9317-db90-4f06-b9c7-6b00c255b72d' is executed.
+11:04:53.014 [INFO ] [openhab.event.ItemCommandEvent       ] - Item 'testSwitch' received command OFF
+11:04:53.019 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Item-testSwitch-received-update_f7cbf540722811ec8814b827eba9d5bf_f7cc435e722811ecbbc4b827eba9d5bf' of rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is triggered.
+11:04:53.024 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using event bus name of Master
+11:04:53.024 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from ON to OFF
+11:04:53.031 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using statePublishTopic /messages/states/${item}
+11:04:53.036 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandPublishTopic
+11:04:53.041 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using stateSubscribeTopic
+11:04:53.046 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandSubscribeTopic /messages/commands/${item}
+11:04:53.051 [INFO ] [jsr223.jython.mqtt_eb                ] - Publishing OFF to  /messages/states/testSwitch on mqtt:broker:mqttbroker with retained 1
+11:04:53.055 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule 'aca0842d-2567-4835-b02c-3aa02f14b96a' is executed.
+```
+
+#### Check the slave logging
+
+The logs on the slave(s) could look like this:
+
+```
+11:02:40.429 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '18334321-f767-4c9b-8846-80068e92e8f1' is executed.
+11:02:48.271 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Channel_mqtt_broker_mqttbroker_stateUpdates_triggered_e572469e722911ecaa62b827eb8adac3_e5a1e21e722911ecb94eb827eb8adac3' of rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is triggered.
+11:02:48.277 [INFO ] [openhab.event.ChannelTriggeredEvent  ] - mqtt:broker:mqttbroker:stateUpdates triggered /messages/states/testSwitch#ON
+11:02:48.278 [INFO ] [23.jython.MQTT Event Bus Subscription] - Subscribing /messages/states/testSwitch with state  /messages/states/testSwitch
+11:02:48.289 [INFO ] [23.jython.MQTT Event Bus Subscription] - Event type state for item  testSwitch
+11:02:48.294 [DEBUG] [23.jython.MQTT Event Bus Subscription] - Received update ON for Item testSwitch
+11:02:48.298 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is executed.
+11:02:48.303 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from OFF to ON
+11:02:50.418 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Time_cron_0_10_de6eed40722911ecb871b827eb8adac3_df0b7b5e722911ecbc6eb827eb8adac3' of rule '18334321-f767-4c9b-8846-80068e92e8f1' is triggered.
+11:02:50.423 [INFO ] [.Jython Hello World (cron decorators)] - Hello World!
+11:02:50.428 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '18334321-f767-4c9b-8846-80068e92e8f1' is executed.
+11:02:52.013 [INFO ] [openhab.event.ItemCommandEvent       ] - Item 'testSwitch' received command OFF
+11:02:52.017 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Item-testSwitch-received-command_e49db88f722911ecb48fb827eb8adac3_e49e06ae722911ecb01eb827eb8adac3' of rule 'afacc4e6-80aa-4bd1-b757-23d8ae243e77' is triggered.
+11:02:52.023 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using event bus name of Slave
+11:02:52.029 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from ON to OFF
+11:02:52.034 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using statePublishTopic
+11:02:52.039 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandPublishTopic /messages/commands/${item}
+11:02:52.044 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using stateSubscribeTopic /messages/states/${item}
+11:02:52.050 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandSubscribeTopic
+11:02:52.055 [INFO ] [jsr223.jython.mqtt_eb                ] - Publishing OFF to  /messages/commands/testSwitch on mqtt:broker:mqttbroker with retained 0
+11:02:52.060 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule 'afacc4e6-80aa-4bd1-b757-23d8ae243e77' is executed.
+11:02:52.144 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Channel_mqtt_broker_mqttbroker_stateUpdates_triggered_e572469e722911ecaa62b827eb8adac3_e5a1e21e722911ecb94eb827eb8adac3' of rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is triggered.
+11:02:52.150 [INFO ] [openhab.event.ChannelTriggeredEvent  ] - mqtt:broker:mqttbroker:stateUpdates triggered /messages/states/testSwitch#OFF
+11:02:52.150 [INFO ] [23.jython.MQTT Event Bus Subscription] - Subscribing /messages/states/testSwitch with state  /messages/states/testSwitch
+11:02:52.163 [INFO ] [23.jython.MQTT Event Bus Subscription] - Event type state for item  testSwitch
+11:02:52.170 [DEBUG] [23.jython.MQTT Event Bus Subscription] - Received update OFF for Item testSwitch
+11:02:52.173 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is executed.
+11:02:56.290 [INFO ] [openhab.event.ItemCommandEvent       ] - Item 'testSwitch' received command ON
+11:02:56.296 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Item-testSwitch-received-command_e49db88f722911ecb48fb827eb8adac3_e49e06ae722911ecb01eb827eb8adac3' of rule 'afacc4e6-80aa-4bd1-b757-23d8ae243e77' is triggered.
+11:02:56.299 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using event bus name of Slave
+11:02:56.306 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from OFF to ON
+11:02:56.307 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using statePublishTopic
+11:02:56.314 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandPublishTopic /messages/commands/${item}
+11:02:56.320 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using stateSubscribeTopic /messages/states/${item}
+11:02:56.325 [INFO ] [jsr223.jython.MQTT Event Bus         ] - Using commandSubscribeTopic
+11:02:56.330 [INFO ] [jsr223.jython.mqtt_eb                ] - Publishing ON to  /messages/commands/testSwitch on mqtt:broker:mqttbroker with retained 0
+11:02:56.334 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule 'afacc4e6-80aa-4bd1-b757-23d8ae243e77' is executed.
+11:02:56.414 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Channel_mqtt_broker_mqttbroker_stateUpdates_triggered_e572469e722911ecaa62b827eb8adac3_e5a1e21e722911ecb94eb827eb8adac3' of rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is triggered.
+11:02:56.419 [INFO ] [openhab.event.ChannelTriggeredEvent  ] - mqtt:broker:mqttbroker:stateUpdates triggered /messages/states/testSwitch#ON
+11:02:56.420 [INFO ] [23.jython.MQTT Event Bus Subscription] - Subscribing /messages/states/testSwitch with state  /messages/states/testSwitch
+11:02:56.430 [INFO ] [23.jython.MQTT Event Bus Subscription] - Event type state for item  testSwitch
+11:02:56.438 [DEBUG] [23.jython.MQTT Event Bus Subscription] - Received update ON for Item testSwitch
+11:02:56.441 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is executed.
+11:03:00.418 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Time_cron_0_10_de6eed40722911ecb871b827eb8adac3_df0b7b5e722911ecbc6eb827eb8adac3' of rule '18334321-f767-4c9b-8846-80068e92e8f1' is triggered.
+11:03:00.423 [INFO ] [.Jython Hello World (cron decorators)] - Hello World!
+11:03:00.428 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '18334321-f767-4c9b-8846-80068e92e8f1' is executed.
+11:03:00.843 [DEBUG] [re.automation.internal.RuleEngineImpl] - The trigger 'Channel_mqtt_broker_mqttbroker_stateUpdates_triggered_e572469e722911ecaa62b827eb8adac3_e5a1e21e722911ecb94eb827eb8adac3' of rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is triggered.
+11:03:00.848 [INFO ] [openhab.event.ChannelTriggeredEvent  ] - mqtt:broker:mqttbroker:stateUpdates triggered /messages/states/testSwitch#OFF
+11:03:00.850 [INFO ] [23.jython.MQTT Event Bus Subscription] - Subscribing /messages/states/testSwitch with state  /messages/states/testSwitch
+11:03:00.857 [INFO ] [23.jython.MQTT Event Bus Subscription] - Event type state for item  testSwitch
+11:03:00.863 [DEBUG] [23.jython.MQTT Event Bus Subscription] - Received update OFF for Item testSwitch
+11:03:00.867 [DEBUG] [re.automation.internal.RuleEngineImpl] - The rule '3221aaa7-9b2c-481e-ba9b-d8f4c012d716' is executed.
+11:03:00.873 [INFO ] [openhab.event.ItemStateChangedEvent  ] - Item 'testSwitch' changed from ON to OFF
+```
