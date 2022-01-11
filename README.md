@@ -185,7 +185,7 @@ cd ~
 git clone https://github.com/rkoshak/openhab-rules-tools.git
 cp -r ~/openhab-rules-tools/rules_utils/automation /etc/openhab2
 git clone https://github.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus.git
-cp -r ~/openHAB-Helper-Libraries-MQTT-Event-Bus/mqtt_eb/automation /etc/openhab
+cp -r ~/openHAB-Helper-Libraries-MQTT-Event-Bus/automation /etc/openhab2
 sudo chmod -R 777 /etc/openhab2/automation
 sudo chown -R openhab:openhab /etc/openhab2/automation
 ```
@@ -209,7 +209,7 @@ cd ~
 git clone https://github.com/rkoshak/openhab-rules-tools.git
 cp -r ~/openhab-rules-tools/rules_utils/automation /etc/openhab
 git clone https://github.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus.git
-cp -r ~/openHAB-Helper-Libraries-MQTT-Event-Bus/mqtt_eb/automation /etc/openhab
+cp -r ~/openHAB-Helper-Libraries-MQTT-Event-Bus/automation /etc/openhab
 sudo chmod -R 777 /etc/openhab/automation
 sudo chown -R openhab:openhab /etc/openhab/automation
 ```
@@ -284,12 +284,6 @@ log:set DEBUG jsr223
 ```
 
 If you run `log:tail` you should see all DEBUG informations from the Scripted Automation. If you have installed the `Jython Hello World example` you should also see this in the logging.
-
-
-
-
-
-
 
 ## Master / Slave example
 
