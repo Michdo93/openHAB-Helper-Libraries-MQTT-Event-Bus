@@ -304,48 +304,84 @@ You have to make sure that the item names on the master and on the slave(s) are 
 On the master you can create a configuration like this:
 
 ```
-log_state: true
-statePublishTopic: openHAB/in/${item}/state
-commandPublishTopic: ''
-stateSubscribeTopic: ''
-commandSubscribeTopic: openHAB/out/${item}/command
+# The name to use for this instance of openHAB, forms the root of the MQTT topic
+# hierarchy.
+mqtt_eb_name = "Master"
+
+# Thing ID for the MQTT broker Thing.
+mqtt_eb_broker = "mqtt:broker:mqttbroker"
+
+# The Channel ID of the MQTT Event Bus subscription channel
+mqtt_eb_in_chan = "mqtt:broker:mqttbroker:commandUpdates"
+
+statePublishTopic = "/messages/states/${item}"
+commandPublishTopic = ""
+stateSubscribeTopic = ""
+commandSubscribeTopic = "/messages/commands/${item}"
 ```
 
 and on the slave like this:
 
 ```
-log_state: true
-statePublishTopic: ''
-commandPublishTopic: openHAB/out/${item}/command
-stateSubscribeTopic: openHAB/in/${item}/state
-commandSubscribeTopic: ''
+# The name to use for this instance of openHAB, forms the root of the MQTT topic
+# hierarchy.
+mqtt_eb_name = "Slave"
+
+# Thing ID for the MQTT broker Thing.
+mqtt_eb_broker = "mqtt:broker:mqttbroker"
+
+# The Channel ID of the MQTT Event Bus subscription channel
+mqtt_eb_in_chan = "mqtt:broker:mqttbroker:stateUpdates"
+
+statePublishTopic = ""
+commandPublishTopic = "/messages/commands/${item}"
+stateSubscribeTopic = "/messages/states/${item}"
+commandSubscribeTopic = ""
 ```
 
-Or on the master you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master1 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master1 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`. On the slave you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave1 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave1 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`.
+Or you can copy it from the `configuration.py.mqtt_eb-master1` or from the `configuration.py.mqtt_eb-slave1` to the `configuration.py` file.
 
 ### Configuration example 2
 
 On the master you can create a configuration like this:
 
 ```
-log_state: true
-statePublishTopic: /messages/states/${item}
-commandPublishTopic: ''
-stateSubscribeTopic: ''
-commandSubscribeTopic: /messages/commands/${item}
+# The name to use for this instance of openHAB, forms the root of the MQTT topic
+# hierarchy.
+mqtt_eb_name = "Master"
+
+# Thing ID for the MQTT broker Thing.
+mqtt_eb_broker = "mqtt:broker:mqttbroker"
+
+# The Channel ID of the MQTT Event Bus subscription channel
+mqtt_eb_in_chan = "mqtt:broker:mqttbroker:commandUpdates"
+
+statePublishTopic = "openHAB/in/${item}/state"
+commandPublishTopic = ""
+stateSubscribeTopic = ""
+commandSubscribeTopic = "openHAB/out/${item}/command"
 ```
 
 and on the slave like this:
 
 ```
-log_state: true
-statePublishTopic: ''
-commandPublishTopic: /messages/commands/${item}
-stateSubscribeTopic: /messages/states/${item}
-commandSubscribeTopic: ''
+# The name to use for this instance of openHAB, forms the root of the MQTT topic
+# hierarchy.
+mqtt_eb_name = "Slave"
+
+# Thing ID for the MQTT broker Thing.
+mqtt_eb_broker = "mqtt:broker:mqttbroker"
+
+# The Channel ID of the MQTT Event Bus subscription channel
+mqtt_eb_in_chan = "mqtt:broker:mqttbroker:stateUpdates"
+
+statePublishTopic = ""
+commandPublishTopic = "openHAB/out/${item}/command"
+stateSubscribeTopic = "openHAB/in/${item}/state"
+commandSubscribeTopic = ""
 ```
 
-Or on the master you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master2 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.master2 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`. On the slave you can download it with `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave2 -O /etc/openhab/habapp/params/mqtt_event_bus.yml` or `wget https://raw.githubusercontent.com/Michdo93/HABApp-MQTT-Event-Bus/main/example/mqtt_event_bus.yml.slave2 -O /etc/openhab2/habapp/params/mqtt_event_bus.yml`.
+Or you can copy it from the `configuration.py.mqtt_eb-master2` or from the `configuration.py.mqtt_eb-slave2` to the `configuration.py` file.
 
 ### Proof of concept
 
