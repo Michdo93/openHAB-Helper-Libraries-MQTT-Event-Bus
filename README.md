@@ -194,6 +194,12 @@ Please copy the configuration from `/etc/openhab2/automation/lib/python/configur
 
 You can have a look on the master/slave example!
 
+Also you have to install the MQTT 2.x Binding. Go to `PaperUI --> Add-ons --> Bindings --> MQTT Binding --> Install`. After that you have to create a connection to the installed Mosquitto Broker with a `MQTT Broker Thing`. Go to `Things --> + --> MQTT Binding --> Add manually --> MQTT Broker`. At least this thing should contain a `Triggering Channel`. The master should have a `Triggering Channel` which should be triggered if the slave send out `commands` and the slave(s) should have a `Triggering Channel` which should be triggered if the master send out `states`.
+
+Please make sure that the configuration.py uses the `Thing Identifier` as parameter for `mqtt_eb_broker` and the `Channel Identifier` as parameter for `mqtt_eb_in_chan`!
+
+For a better understanding have a look at the configuration for openHAB 3!
+
 ### Install the MQTT Event Bus on openHAB 3.x
 
 The script is adapted from Rich Koshak's [Marketplace MQTT Event Bus Script](https://community.openhab.org/t/marketplace-mqtt-event-bus/76938) from his [openHAB Rules Tools](https://github.com/rkoshak/openhab-rules-tools). We adopt a part of it.
@@ -211,6 +217,36 @@ sudo chown -R openhab:openhab /etc/openhab/automation
 Please copy the configuration from `/etc/openhab/automation/lib/python/configuration.py.mqtt_eb-example` to `/etc/openhab/automation/lib/python/configuration.py` and adjust it accordingly.
 
 You can have a look on the master/slave example!
+
+Also you have to install the MQTT 3.x Binding. Go to `Settings --> Bindings --> + --> MQTT Binding --> Install`. After that you have to create a connection to the installed Mosquitto Broker with a `MQTT Broker Thing`. Go to `Things --> + --> MQTT Binding --> MQTT Broker`.
+
+On the master you can set a configuration like the following:
+
+![master_broker_config](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/master_broker_config.JPG)
+![master_broker_config](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/master_broker_config2.JPG)
+![master_broker_config](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/master_broker_config3.JPG)
+
+On the slave you can set a configuration like this:
+
+![slave_broker_config](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/slave_broker_config.JPG)
+![slave_broker_config](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/slave_broker_config2.JPG)
+![slave_broker_config](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/slave_broker_config3.JPG)
+
+You have to make sure that the slave(s) uses the Hostname or IP from the master. In the given example you can see the IP address `192.168.0.74` for this.
+
+At least this thing should contain a `Triggering Channel`. The master should have a `Triggering Channel` which should be triggered if the slave send out `commands` and the slave(s) should have a `Triggering Channel` which should be triggered if the master send out `states`.
+
+In the next step you go to `Things` and click on the created thing from the steps above. There you have to go to the tab `Channels` and click on `Add Channel` to create a `Triggering Channel`.
+
+On the master it could look like this:
+
+![master_trigger_channel](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/master_trigger_channel.JPG)
+
+On the slave it could look like this:
+
+![slave_trigger_channel](https://raw.githubusercontent.com/Michdo93/openHAB-Helper-Libraries-MQTT-Event-Bus/main/slave_trigger_channel.JPG)
+
+Please make sure that the configuration.py uses the `Thing Identifier` as parameter for `mqtt_eb_broker` and the `Channel Identifier` as parameter for `mqtt_eb_in_chan`!
 
 ### Restart openHAB
 
