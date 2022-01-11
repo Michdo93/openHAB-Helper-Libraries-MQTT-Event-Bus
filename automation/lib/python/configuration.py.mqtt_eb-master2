@@ -1,0 +1,14 @@
+# The name to use for this instance of openHAB, forms the root of the MQTT topic
+# hierarchy.
+mqtt_eb_name = "Master"
+
+# Thing ID for the MQTT broker Thing.
+mqtt_eb_broker = "mqtt:broker:mqttbroker"
+
+# The Channel ID of the MQTT Event Bus subscription channel
+mqtt_eb_in_chan = "mqtt:broker:mqttbroker:commandUpdates"
+
+statePublishTopic = "openHAB/in/${item}/state"
+commandPublishTopic = ""
+stateSubscribeTopic = ""
+commandSubscribeTopic = "openHAB/out/${item}/command"
