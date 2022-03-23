@@ -1,5 +1,5 @@
 """
-Copyright July 10, 2020 Richard Koshak
+Copyright July 10, 2020 Richard Koshak and Michael Dörflinger
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -208,17 +208,19 @@ def mqtt_eb_sub(event):
     mqtt_eb_sub.log.info("Event type {} for item {}"
                          .format(event_type, item_name))
 
-    if item_name not in items:
-        mqtt_eb_sub.log.debug("Local openHAB does not have Item {}, ignoring."
-                              .format(item_name))
-    elif event_type == "command":
-        mqtt_eb_sub.log.debug("Received command {} for Item {}"
-                              .format(state, item_name))
-        events.sendCommand(item_name, state)
-    else:
-        mqtt_eb_sub.log.debug("Received update {} for Item {}"
-                              .format(state, item_name))
-        events.postUpdate(item_name, state)
+    for i in items:
+        if i == item_name:
+            if event_type == "command":
+                mqtt_eb_sub.log.debug("Received command {} for Item {}"
+                                      .format(state, item_name))
+                events.sendCommand(item_name, state)
+            else:
+                mqtt_eb_sub.log.debug("Received update {} for Item {}"
+                                      .format(state, item_name))
+                events.postUpdate(item_name, state)
+        #else:
+            #mqtt_eb_sub.log.debug("Local openHAB does not have Item {}, ignoring."
+            #                      .format(item_name))
 
 
 @ log_traceback
