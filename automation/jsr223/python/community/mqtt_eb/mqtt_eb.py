@@ -195,11 +195,11 @@ def mqtt_eb_sub(event):
     mqtt_eb_sub.log.info("Subscribing {} with state  {}"
                          .format(topic, topic))
 
-    if state_publish_topic != '':
+    if state_publish_topic:
         event_type = 'state'
         itemPosition = state_publish_topic.split("${item}")[0].count("/")
 
-    if command_subscribe_topic != '':
+    if command_subscribe_topic:
         event_type = 'command'
         itemPosition = command_subscribe_topic.split("${item}")[0].count("/")
 
@@ -223,7 +223,7 @@ def mqtt_eb_sub(event):
             #                      .format(item_name))
 
 
-@ log_traceback
+@log_traceback
 def online(event):
     """Publishes ONLINE to mqtt_eb_name/status on System started."""
 
@@ -234,7 +234,7 @@ def online(event):
                                                     "ONLINE", True)
 
 
-@ log_traceback
+@log_traceback
 def load_online():
     """Loads the online status publishing rule."""
 
@@ -252,7 +252,7 @@ def load_online():
         init_logger.error("Failed to create MQTT Event Bus Online rule!")
 
 
-@ log_traceback
+@log_traceback
 def load_mqtt_eb(event):
     """Deletes and recreates the MQTT Event Bus publisher and online rules."""
 
@@ -297,7 +297,7 @@ def load_mqtt_eb(event):
             "Failed to create MQTT Event Bus Subscription!")
 
 
-@ log_traceback
+@log_traceback
 def scriptLoaded(*args):
     """Creates and then calls the Reload MQTT Event Bus Publisher rule."""
 
@@ -310,7 +310,7 @@ def scriptLoaded(*args):
         load_mqtt_eb(None)
 
 
-@ log_traceback
+@log_traceback
 def scriptUnloaded():
     """Deletes the MQTT Event Bus Publisher and Online rules and the reload rule."""
     delete_rule(load_mqtt_eb, init_logger)
